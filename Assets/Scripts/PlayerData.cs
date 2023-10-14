@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class PlayerData: MonoBehaviour
+public class PlayerData : MonoBehaviour
 {
     [SerializeField]
     private float maxHp = 10;
@@ -13,6 +14,7 @@ public class PlayerData: MonoBehaviour
     // gameobject, current value, change type (1 for positive, -1 for negative)
     public event Action<GameObject, int, int> onCoinChange;
     public event Action<GameObject, float, int> onHealthChange;
+    public event Action onDeath;
 
     public void addCoins(int amount)
     {
@@ -34,7 +36,12 @@ public class PlayerData: MonoBehaviour
     }
     public void deductHealth(float amount)
     {
-        hp = hp -= amount < 0 ? 0 : hp -= amount;
+        if (hp - amount < 0)
+        {
+            hp = 0;
+            onDeath?.Invoke();
+        }
+        else { hp -= amount; }
         onHealthChange?.Invoke(gameObject, hp, -1);
     }
     public float getHealth()

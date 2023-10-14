@@ -6,10 +6,11 @@ using UnityEngine;
 public class PlayerAnims : MonoBehaviour
 {
     PlayerMovement playerMovement;
+    PlayerData playerData;
     Animator animator;
     public enum AnimationState
     {
-        Idle, Jump, Fall, Run
+        Idle, Jump, Fall, Run, Death
     }
     public AnimationState state;
 
@@ -20,6 +21,7 @@ public class PlayerAnims : MonoBehaviour
         // initialize components
         playerMovement = GetComponent<PlayerMovement>();
         animator = GetComponent<Animator>();
+        playerData= GetComponent<PlayerData>();
 
         // subscribe to player movement events
         playerMovement.onMove += runAnim;
@@ -27,7 +29,10 @@ public class PlayerAnims : MonoBehaviour
         playerMovement.onFall += fallAnim;
         playerMovement.onLand += idleAnim;
         playerMovement.onIdle += idleAnim;
+
+        playerData.onDeath += deathAnim;
     }
+
     private void OnDestroy()
     {
 
@@ -36,6 +41,8 @@ public class PlayerAnims : MonoBehaviour
         playerMovement.onFall -= fallAnim;
         playerMovement.onLand -= idleAnim;
         playerMovement.onIdle -= idleAnim;
+
+        playerData.onDeath -= deathAnim;
     }
     private void Update()
     {
@@ -73,6 +80,14 @@ public class PlayerAnims : MonoBehaviour
     {
         changeAnimationState(AnimationState.Idle);
         Collider2DUtils.TryUpdateShapeToAttachedSprite(GetComponent<PolygonCollider2D>());
+    }
+
+    private void deathAnim()
+    {
+        changeAnimationState(AnimationState.Death);
+        Collider2DUtils.TryUpdateShapeToAttachedSprite(GetComponent<PolygonCollider2D>());
+        // no more animations after death
+        Destroy(this);
     }
 
     // utility functions -------------

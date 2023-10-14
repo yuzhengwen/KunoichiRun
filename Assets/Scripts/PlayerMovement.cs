@@ -50,7 +50,7 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetButtonDown("Jump"))
                 onJump?.Invoke(this);
             // if player is not moving at all, trigger idle event
-            if (rb.velocity.magnitude == 0)
+            if (rb.velocity.magnitude ==0)
             {
                 onIdle?.Invoke(this);
             }
@@ -104,5 +104,9 @@ public class PlayerMovement : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         other.gameObject.GetComponent<ICollectible>()?.onPlayerCollect(this.gameObject);
+    }
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        collision.gameObject.GetComponent<IObstacle>()?.onDamagePlayer(this.gameObject);
     }
 }

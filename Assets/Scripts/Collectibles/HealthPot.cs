@@ -5,10 +5,11 @@ using UnityEngine;
 public class HealthPot : MonoBehaviour, ICollectible
 {
     public float addHP = 1;
+    private PlayerData playerData;
     void ICollectible.onPlayerCollect(GameObject player)
     {
-        PlayerData data = player.GetComponent<PlayerData>();
-        data.addHealth(addHP);
+        if (playerData == null) playerData = player.GetComponent<PlayerData>();
+        playerData.addHealth(addHP);
         Destroy(this.gameObject);
     }
 }
