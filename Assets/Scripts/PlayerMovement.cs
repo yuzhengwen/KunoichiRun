@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -17,17 +19,12 @@ public class PlayerMovement : MonoBehaviour
 
     // player movement events
     public event Action<PlayerMovement> onJump;
+    public event Action<PlayerMovement> onFall;
     public event Action<PlayerMovement> onLand;
     public event Action<PlayerMovement> onMove;
     public event Action<PlayerMovement> onIdle;
 
     private bool jumped = false;
-    private bool startFalling = false;
-
-    public enum state
-    {
-        Grounded, Jumping, Running
-    }
 
     // Start is called before the first frame update
     void Start()
@@ -41,35 +38,40 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         horizontal = Input.GetAxisRaw("Horizontal");
-        if (!jumped && horizontal != 0) 
-            onMove?.Invoke(this);
-        if (!jumped && Input.GetButtonDown("Jump"))
-            onJump?.Invoke(this);
 
-        // check jump landed, trigger on land event
-        if (rb.velocity.y == 0 && jumped)
+        if (!jumped)
         {
-            // first time v=0 at the top
-            if (!startFalling)
-                startFalling = true;
-            // 2nd time v=0 when landed
-            else
+            if (horizontal != 0)
+                onMove?.Invoke(this);
+            if (Input.GetButtonDown("Jump"))
+                onJump?.Invoke(this);
+            // if player is not moving at all, trigger idle event
+            if (rb.velocity.magnitude == 0)
+            {
+                onIdle?.Invoke(this);
+            }
+        }
+
+        // in jumping motion
+        else if (jumped)
+        {
+            // as y velocity changes to negative -> falling
+            if (rb.velocity.y < 0 && rb.velocity.y > -0.25f)
+                onFall?.Invoke(this);
+
+            // if y velocity is negative and near ground -> landing
+            if (rb.velocity.y < 0 && isGrounded())
             {
                 onLand?.Invoke(this);
-                startFalling = false;
                 jumped = false;
             }
         }
 
-        // if player is not moving, trigger idle event
-        if (!jumped && rb.velocity.magnitude == 0)
-        {
-            onIdle?.Invoke(this);
-        }
+
     }
     void FixedUpdate()
     {
-        calculateMovement();
+        calculateMovement(); 
     }
 
     private void calculateMovement()
@@ -84,20 +86,12 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // proper ground check using raycasts, to be used later
-    public LayerMask groundLayer;
-    bool IsGrounded()
+    public LayerMask terrain;
+    bool isGrounded()
     {
-        Vector2 position = transform.position;
-        Vector2 direction = Vector2.down;
-        float distance = 1.0f;
-
-        RaycastHit2D hit = Physics2D.Raycast(position, direction, distance, groundLayer);
-        if (hit.collider != null)
-        {
-            return true;
-        }
-
-        return false;
+        Collider2D collider = GetComponent<CapsuleCollider2D>();
+        // create a box cast collider slightly below player to check for ground
+        return Physics2D.BoxCast(collider.bounds.center, collider.bounds.size, 0f, Vector2.down, 0.1f, terrain);
     }
     public float getFacingDirection()
     {

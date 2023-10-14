@@ -9,7 +9,7 @@ public class PlayerAnims : MonoBehaviour
     Animator animator;
     public enum AnimationState
     {
-        Idle, Jump, Run
+        Idle, Jump, Fall, Run
     }
     public AnimationState state;
 
@@ -22,10 +22,20 @@ public class PlayerAnims : MonoBehaviour
         animator = GetComponent<Animator>();
 
         // subscribe to player movement events
-        playerMovement.onJump += jumpAnim;
         playerMovement.onMove += runAnim;
+        playerMovement.onJump += jumpAnim;
+        playerMovement.onFall += fallAnim;
         playerMovement.onLand += idleAnim;
         playerMovement.onIdle += idleAnim;
+    }
+    private void OnDestroy()
+    {
+
+        playerMovement.onMove -= runAnim;
+        playerMovement.onJump -= jumpAnim;
+        playerMovement.onFall -= fallAnim;
+        playerMovement.onLand -= idleAnim;
+        playerMovement.onIdle -= idleAnim;
     }
     private void Update()
     {
@@ -47,6 +57,10 @@ public class PlayerAnims : MonoBehaviour
         // play jump animation only if playing is not moving horizontally
         if (playerMovement.getFacingDirection() == 0)
             changeAnimationState(AnimationState.Jump);
+    }
+    private void fallAnim(PlayerMovement playerMovement)
+    {
+        changeAnimationState(AnimationState.Fall);
     }
 
     private void idleAnim(PlayerMovement playerMovement)
@@ -70,7 +84,6 @@ public class PlayerAnims : MonoBehaviour
     }
     private bool isAnimationPlaying(AnimationState state)
     {
-        Debug.Log(animator.GetNextAnimatorStateInfo(0).normalizedTime);
         return animator.GetCurrentAnimatorStateInfo(0).IsName(state.ToString())
             && animator.GetNextAnimatorStateInfo(0).normalizedTime < 1;
     }
