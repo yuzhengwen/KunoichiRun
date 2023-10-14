@@ -24,6 +24,8 @@ public class PlayerMovement : MonoBehaviour
     public event Action<PlayerMovement> onMove;
     public event Action<PlayerMovement> onIdle;
 
+    public event Action<ICollectible> onCollect;
+
     private bool jumped = false;
 
     // Start is called before the first frame update
@@ -32,6 +34,10 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
 
         onJump += jump;
+    }
+    private void OnDestroy()
+    {
+        onJump -= jump;
     }
 
     // Update is called once per frame
@@ -71,7 +77,7 @@ public class PlayerMovement : MonoBehaviour
     }
     void FixedUpdate()
     {
-        calculateMovement(); 
+        calculateMovement();
     }
 
     private void calculateMovement()
@@ -85,16 +91,21 @@ public class PlayerMovement : MonoBehaviour
         jumped = true;
     }
 
-    // proper ground check using raycasts, to be used later
+    // proper ground check using boxcast
     public LayerMask terrain;
     bool isGrounded()
     {
-        Collider2D collider = GetComponent<CapsuleCollider2D>();
+        Collider2D collider = GetComponent<PolygonCollider2D>();
         // create a box cast collider slightly below player to check for ground
         return Physics2D.BoxCast(collider.bounds.center, collider.bounds.size, 0f, Vector2.down, 0.1f, terrain);
     }
     public float getFacingDirection()
     {
         return horizontal;
+    }
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        other.gameObject.GetComponent<ICollectible>()?.onPlayerCollect(this.gameObject);
+        onCollect?.Invoke(other.gameObject.GetComponent<ICollectible>());
     }
 }

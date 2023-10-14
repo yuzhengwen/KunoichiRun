@@ -41,15 +41,23 @@ public class PlayerAnims : MonoBehaviour
     {
     }
 
+    // main animation functions ----------------
+    private bool facingRight = true;
     private void runAnim(PlayerMovement playerMovement)
     {
         // flip according to direction player is facing
-        if (playerMovement.getFacingDirection()>0)
+        /*if (playerMovement.getFacingDirection()>0)
             gameObject.GetComponent<SpriteRenderer>().flipX = false;
         else if (playerMovement.getFacingDirection()<0)
-            gameObject.GetComponent<SpriteRenderer>().flipX = true;
+            gameObject.GetComponent<SpriteRenderer>().flipX = true;*/
+        if (facingRight != playerMovement.getFacingDirection() > 0)
+        {
+            transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
+            facingRight = !facingRight;
+        }
         // play run animation
         changeAnimationState(AnimationState.Run);
+        Collider2DUtils.TryUpdateShapeToAttachedSprite(GetComponent<PolygonCollider2D>());
     }
 
     private void jumpAnim(PlayerMovement playerMovement)
@@ -57,16 +65,21 @@ public class PlayerAnims : MonoBehaviour
         // play jump animation only if playing is not moving horizontally
         if (playerMovement.getFacingDirection() == 0)
             changeAnimationState(AnimationState.Jump);
+        Collider2DUtils.TryUpdateShapeToAttachedSprite(GetComponent<PolygonCollider2D>());
     }
     private void fallAnim(PlayerMovement playerMovement)
     {
         changeAnimationState(AnimationState.Fall);
+        Collider2DUtils.TryUpdateShapeToAttachedSprite(GetComponent<PolygonCollider2D>());
     }
 
     private void idleAnim(PlayerMovement playerMovement)
     {
         changeAnimationState(AnimationState.Idle);
+        Collider2DUtils.TryUpdateShapeToAttachedSprite(GetComponent<PolygonCollider2D>());
     }
+
+    // utility functions -------------
     IEnumerator queueAnimation(AnimationState current, AnimationState next, float delay)
     {
         changeAnimationState(current);
@@ -74,7 +87,7 @@ public class PlayerAnims : MonoBehaviour
         changeAnimationState(next);
     }
 
-    public void changeAnimationState(AnimationState state)
+    private void changeAnimationState(AnimationState state)
     {
         if (this.state == state) return;
 
