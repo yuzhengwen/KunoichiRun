@@ -24,8 +24,6 @@ public class PlayerMovement : MonoBehaviour
     public event Action<PlayerMovement> onMove;
     public event Action<PlayerMovement> onIdle;
 
-    public event Action<ICollectible> onCollect;
-
     private bool jumped = false;
 
     // Start is called before the first frame update
@@ -106,6 +104,5 @@ public class PlayerMovement : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         other.gameObject.GetComponent<ICollectible>()?.onPlayerCollect(this.gameObject);
-        onCollect?.Invoke(other.gameObject.GetComponent<ICollectible>());
     }
 }

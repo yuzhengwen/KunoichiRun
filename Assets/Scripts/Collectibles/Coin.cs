@@ -9,20 +9,7 @@ public class Coin : MonoBehaviour, ICollectible
     void ICollectible.onPlayerCollect(GameObject player)
     {
         PlayerData data = player.GetComponent<PlayerData>();
-        data.coins += coinValue;
+        data.addCoins(coinValue);
         Destroy(this.gameObject);
-    }
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 }

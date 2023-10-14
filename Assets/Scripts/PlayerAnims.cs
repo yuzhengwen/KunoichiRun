@@ -46,10 +46,6 @@ public class PlayerAnims : MonoBehaviour
     private void runAnim(PlayerMovement playerMovement)
     {
         // flip according to direction player is facing
-        /*if (playerMovement.getFacingDirection()>0)
-            gameObject.GetComponent<SpriteRenderer>().flipX = false;
-        else if (playerMovement.getFacingDirection()<0)
-            gameObject.GetComponent<SpriteRenderer>().flipX = true;*/
         if (facingRight != playerMovement.getFacingDirection() > 0)
         {
             transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
