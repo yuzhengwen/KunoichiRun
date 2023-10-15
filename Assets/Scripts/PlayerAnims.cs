@@ -29,6 +29,7 @@ public class PlayerAnims : MonoBehaviour
         playerMovement.onFall += fallAnim;
         playerMovement.onLand += idleAnim;
         playerMovement.onIdle += idleAnim;
+        playerMovement.onFlip += flip;
 
         playerData.onDeath += deathAnim;
     }
@@ -41,6 +42,7 @@ public class PlayerAnims : MonoBehaviour
         playerMovement.onFall -= fallAnim;
         playerMovement.onLand -= idleAnim;
         playerMovement.onIdle -= idleAnim;
+        playerMovement.onFlip -= flip;
 
         playerData.onDeath -= deathAnim;
     }
@@ -50,14 +52,17 @@ public class PlayerAnims : MonoBehaviour
 
     // main animation functions ----------------
     private bool facingRight = true;
-    private void runAnim(PlayerMovement playerMovement)
+    private void flip(bool currDir)
     {
         // flip according to direction player is facing
-        if (facingRight != playerMovement.getFacingDirection() > 0)
+        if (facingRight != currDir)
         {
             transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
             facingRight = !facingRight;
         }
+    }
+    private void runAnim(PlayerMovement playerMovement)
+    {
         // play run animation
         changeAnimationState(AnimationState.Run);
         Collider2DUtils.TryUpdateShapeToAttachedSprite(GetComponent<PolygonCollider2D>());

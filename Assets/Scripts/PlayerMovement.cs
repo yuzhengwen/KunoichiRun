@@ -24,6 +24,7 @@ public class PlayerMovement : MonoBehaviour
     public event Action<PlayerMovement> onLand;
     public event Action<PlayerMovement> onMove;
     public event Action<PlayerMovement> onIdle;
+    public event Action<bool> onFlip;
 
     private bool jumped = false;
 
@@ -47,13 +48,18 @@ public class PlayerMovement : MonoBehaviour
     {
         horizontal = Input.GetAxisRaw("Horizontal");
 
+        if (horizontal != 0)
+            onFlip?.Invoke(horizontal > 0);
+        // player not jumping
         if (!jumped)
         {
+            // play running animation when on ground
             if (horizontal != 0)
                 onMove?.Invoke(this);
+            // only can jump if havent jumped yet
             if (Input.GetButtonDown("Jump"))
                 onJump?.Invoke(this);
-            // if player is not moving at all, trigger idle event
+            // if player is not moving at all & not jumping, trigger idle event
             if (horizontal==0)
             {
                 onIdle?.Invoke(this);
@@ -63,7 +69,7 @@ public class PlayerMovement : MonoBehaviour
         // in jumping motion
         else if (jumped)
         {
-            // as y velocity changes to negative -> falling
+            // as y velocity starts to change to negative -> falling
             if (rb.velocity.y < 0 && rb.velocity.y > -0.25f)
                 onFall?.Invoke(this);
 
@@ -74,7 +80,6 @@ public class PlayerMovement : MonoBehaviour
                 jumped = false;
             }
         }
-
 
     }
     void FixedUpdate()
