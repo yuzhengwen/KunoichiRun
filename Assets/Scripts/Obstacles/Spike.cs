@@ -9,15 +9,17 @@ public class Spike : MonoBehaviour, IObstacle
 
     private PlayerData playerData;
 
-    public void onDamagePlayer(GameObject player)
+    public void onDamagePlayer(GameObject player, Vector2 relVel)
     {
-        Debug.Log("Hit spikes");
-        if (playerData == null) 
+        if (playerData == null)
             playerData = player.GetComponent<PlayerData>();
         if (Time.time >= nextDamageTime)
         {
+            Debug.Log(Time.time);
+            Debug.Log("Nexttime " + nextDamageTime);
             playerData.deductHealth(1);
             nextDamageTime = Time.time + damageInterval;
+            Debug.Log("Nexttime updated " + nextDamageTime);
         }
     }
 
@@ -30,6 +32,6 @@ public class Spike : MonoBehaviour, IObstacle
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

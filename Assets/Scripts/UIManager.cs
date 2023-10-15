@@ -40,6 +40,7 @@ public class UIManager : MonoBehaviour
 
     private void updateHealth(GameObject player, float hp, int changeType)
     {
+        Debug.Log("current hp" + hp);
         healthSlider.value = hp;
         healthFill.color = healthGradient.Evaluate(healthSlider.normalizedValue);
     }

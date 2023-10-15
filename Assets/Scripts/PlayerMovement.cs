@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour
     private float horizontal = 0;
 
     private Rigidbody2D rb;
+    private PlayerData playerData;
 
     // player movement events
     public event Action<PlayerMovement> onJump;
@@ -30,12 +31,15 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        playerData = GetComponent<PlayerData>();
 
         onJump += jump;
+        playerData.onDeath += removeMovement;
     }
     private void OnDestroy()
     {
         onJump -= jump;
+        playerData.onDeath -= removeMovement;
     }
 
     // Update is called once per frame
@@ -50,7 +54,7 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetButtonDown("Jump"))
                 onJump?.Invoke(this);
             // if player is not moving at all, trigger idle event
-            if (rb.velocity.magnitude ==0)
+            if (horizontal==0)
             {
                 onIdle?.Invoke(this);
             }
@@ -89,6 +93,11 @@ public class PlayerMovement : MonoBehaviour
         jumped = true;
     }
 
+    private void removeMovement()
+    {
+        Destroy(this);
+    }
+
     // proper ground check using boxcast
     public LayerMask terrain;
     bool isGrounded()
@@ -107,6 +116,6 @@ public class PlayerMovement : MonoBehaviour
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
-        collision.gameObject.GetComponent<IObstacle>()?.onDamagePlayer(this.gameObject);
+        collision.gameObject.GetComponent<IObstacle>()?.onDamagePlayer(this.gameObject, collision.relativeVelocity);
     }
 }

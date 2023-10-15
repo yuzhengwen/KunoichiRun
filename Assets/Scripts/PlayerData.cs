@@ -37,12 +37,12 @@ public class PlayerData : MonoBehaviour
     public void deductHealth(float amount)
     {
         if (hp - amount < 0)
-        {
             hp = 0;
-            onDeath?.Invoke();
-        }
-        else { hp -= amount; }
+        else hp -= amount;
+
         onHealthChange?.Invoke(gameObject, hp, -1);
+        if (hp == 0) 
+            onDeath?.Invoke();
     }
     public float getHealth()
     {

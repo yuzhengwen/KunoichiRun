@@ -5,5 +5,5 @@ using UnityEngine;
 public interface IObstacle 
 {
     float damageInterval {  get; set; }
-    void onDamagePlayer(GameObject player);
+    void onDamagePlayer(GameObject player, Vector2 relativeVelocity);
 }
