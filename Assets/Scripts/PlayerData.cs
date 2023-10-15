@@ -16,6 +16,10 @@ public class PlayerData : MonoBehaviour
     public event Action<GameObject, float, int> onHealthChange;
     public event Action onDeath;
 
+    [SerializeField]
+    private float damageInterval = 1.0f;
+    private float nextDamageTime = 0;
+
     public void addCoins(int amount)
     {
         coins += amount;
@@ -34,16 +38,27 @@ public class PlayerData : MonoBehaviour
             hp += amount;
         onHealthChange?.Invoke(gameObject, hp, 1);
     }
+
+    // only deduct health once per second
     public void deductHealth(float amount)
     {
-        if (hp - amount < 0)
-            hp = 0;
-        else hp -= amount;
-
-        onHealthChange?.Invoke(gameObject, hp, -1);
-        if (hp == 0) 
-            onDeath?.Invoke();
-    }
+        Debug.Log(Time.time);
+        if (Time.time >= nextDamageTime)
+        {
+            if (hp - amount <= 0)
+            {
+                hp = 0;
+                onHealthChange?.Invoke(gameObject, hp, -1);
+                onDeath?.Invoke();
+            }
+            else
+            {
+                hp -= amount;
+                onHealthChange?.Invoke(gameObject, hp, -1);
+                nextDamageTime = Time.time + damageInterval;
+            }
+        }
+        }
     public float getHealth()
     {
         return hp;

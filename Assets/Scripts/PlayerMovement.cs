@@ -107,7 +107,7 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask terrain;
     bool isGrounded()
     {
-        Collider2D collider = GetComponent<PolygonCollider2D>();
+        Collider2D collider = GetComponent<CapsuleCollider2D>();
         // create a box cast collider slightly below player to check for ground
         return Physics2D.BoxCast(collider.bounds.center, collider.bounds.size, 0f, Vector2.down, 0.1f, terrain);
     }
@@ -123,4 +123,7 @@ public class PlayerMovement : MonoBehaviour
     {
         collision.gameObject.GetComponent<IObstacle>()?.onDamagePlayer(this.gameObject, collision.relativeVelocity);
     }
+
+
+
 }
