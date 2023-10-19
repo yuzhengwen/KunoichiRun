@@ -103,9 +103,7 @@ public class PlayerAnims : MonoBehaviour
     private void healthChangeAnim(GameObject @object, float hp, int change)
     {
         if (change == -1)
-        {
             StartCoroutine("FlashRed");
-        }
     }
     private IEnumerator FlashRed()
     {
