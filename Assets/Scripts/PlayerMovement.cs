@@ -19,12 +19,14 @@ public class PlayerMovement : MonoBehaviour
     private PlayerData playerData;
 
     // player movement events
+    public event Action<PlayerMovement> onMove;
     public event Action<PlayerMovement> onJump;
     public event Action<PlayerMovement> onFall;
-    public event Action<PlayerMovement> onLand;
-    public event Action<PlayerMovement> onMove;
-    public event Action<PlayerMovement> onIdle;
+    public event Action onLand;
+    public event Action onIdle;
     public event Action<bool> onFlip;
+
+    public event Action onFinish;
 
     private bool jumped = false;
 
@@ -36,11 +38,13 @@ public class PlayerMovement : MonoBehaviour
 
         onJump += jump;
         playerData.onDeath += removeMovement;
+        onFinish += removeMovement;
     }
     private void OnDestroy()
     {
         onJump -= jump;
         playerData.onDeath -= removeMovement;
+        onFinish -= removeMovement;
     }
 
     // Update is called once per frame
@@ -62,7 +66,7 @@ public class PlayerMovement : MonoBehaviour
             // if player is not moving at all & not jumping, trigger idle event
             if (horizontal==0)
             {
-                onIdle?.Invoke(this);
+                onIdle?.Invoke();
             }
         }
 
@@ -76,7 +80,7 @@ public class PlayerMovement : MonoBehaviour
             // if y velocity is negative and near ground -> landing
             if (rb.velocity.y < 0 && isGrounded())
             {
-                onLand?.Invoke(this);
+                onLand?.Invoke();
                 jumped = false;
             }
         }
@@ -100,6 +104,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void removeMovement()
     {
+        rb.velocity = Vector2.zero;
         Destroy(this);
     }
 
@@ -118,6 +123,11 @@ public class PlayerMovement : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         other.gameObject.GetComponent<ICollectible>()?.onPlayerCollect(this.gameObject);
+        if (other.gameObject.CompareTag("Finish"))
+            onFinish?.Invoke();
+        if (other.gameObject.CompareTag("Boundary"))
+            playerData.onDeath?.Invoke();
+
     }
     private void OnCollisionStay2D(Collision2D collision)
     {

@@ -12,5 +12,6 @@ public class Spike : MonoBehaviour, IObstacle
         if (playerData == null)
             playerData = player.GetComponent<PlayerData>();
         playerData.deductHealth(1);
+        Debug.Log("Damage");
     }
 }

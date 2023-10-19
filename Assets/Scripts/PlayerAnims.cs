@@ -30,8 +30,10 @@ public class PlayerAnims : MonoBehaviour
         playerMovement.onLand += idleAnim;
         playerMovement.onIdle += idleAnim;
         playerMovement.onFlip += flip;
+        playerMovement.onFinish += idleAnim;
 
         playerData.onDeath += deathAnim;
+        playerData.onHealthChange += healthChangeAnim;
     }
 
     private void OnDestroy()
@@ -43,8 +45,11 @@ public class PlayerAnims : MonoBehaviour
         playerMovement.onLand -= idleAnim;
         playerMovement.onIdle -= idleAnim;
         playerMovement.onFlip -= flip;
+        playerMovement.onFinish -= idleAnim;
 
         playerData.onDeath -= deathAnim;
+        playerData.onHealthChange -= healthChangeAnim;
+
     }
     private void Update()
     {
@@ -81,7 +86,7 @@ public class PlayerAnims : MonoBehaviour
         Collider2DUtils.TryUpdateShapeToAttachedSprite(GetComponent<PolygonCollider2D>());
     }
 
-    private void idleAnim(PlayerMovement playerMovement)
+    private void idleAnim()
     {
         changeAnimationState(AnimationState.Idle);
         Collider2DUtils.TryUpdateShapeToAttachedSprite(GetComponent<PolygonCollider2D>());
@@ -93,6 +98,21 @@ public class PlayerAnims : MonoBehaviour
         Collider2DUtils.TryUpdateShapeToAttachedSprite(GetComponent<PolygonCollider2D>());
         // no more animations after death
         Destroy(this);
+    }
+
+    private void healthChangeAnim(GameObject @object, float hp, int change)
+    {
+        if (change == -1)
+        {
+            StartCoroutine("FlashRed");
+        }
+    }
+    private IEnumerator FlashRed()
+    {
+        SpriteRenderer r = GetComponent<SpriteRenderer>();
+        r.color = new Color(1f, 0f, 0f, .8f);
+        yield return new WaitForSeconds(.2f);
+        r.color = Color.white;
     }
 
     // utility functions -------------

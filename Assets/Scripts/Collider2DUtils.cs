@@ -5,7 +5,8 @@ public static class Collider2DUtils
 {
     public static void TryUpdateShapeToAttachedSprite(this PolygonCollider2D collider)
     {
-        collider.UpdateShapeToSprite(collider.GetComponent<SpriteRenderer>().sprite);
+        // implement this for polygon collider
+        //collider.UpdateShapeToSprite(collider.GetComponent<SpriteRenderer>().sprite);
     }
 
     public static void UpdateShapeToSprite(this PolygonCollider2D collider, Sprite sprite)
