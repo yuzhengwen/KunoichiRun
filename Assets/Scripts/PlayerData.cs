@@ -49,12 +49,14 @@ public class PlayerData : MonoBehaviour
                 hp = 0;
                 onHealthChange?.Invoke(gameObject, hp, -1);
                 onDeath?.Invoke();
+                AudioManager.Instance.playAudio(AudioManager.AudioType.Death);
             }
             else
             {
                 hp -= amount;
                 onHealthChange?.Invoke(gameObject, hp, -1);
                 nextDamageTime = Time.time + damageInterval;
+                AudioManager.Instance.playAudio(AudioManager.AudioType.Damage);
             }
         }
         }

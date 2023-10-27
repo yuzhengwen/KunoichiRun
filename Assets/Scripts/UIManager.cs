@@ -41,8 +41,10 @@ public class UIManager : MonoBehaviour
         updateHealth(null, playerData.getHealth(), 0);
     }
 
+    private float duration;
     public void showPopUp(String text, float duration)
     {
+        this.duration = duration;
         if (popUp.activeInHierarchy)
         {
             StopAllCoroutines();
@@ -54,7 +56,7 @@ public class UIManager : MonoBehaviour
     }
     IEnumerator hidePopUp()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(duration);
         popUp.SetActive(false);
     }
 

@@ -54,24 +54,29 @@ public class PlayerMovement : MonoBehaviour
 
         if (horizontal != 0)
             onFlip?.Invoke(horizontal > 0);
+        
         // player not jumping
         if (!jumped)
         {
             // play running animation when on ground
             if (horizontal != 0)
+            {
                 onMove?.Invoke(this);
+                AudioManager.Instance.playAudio(AudioManager.AudioType.Run);
+            }
+            else
+            {
+                // if player is not moving at all & not jumping, trigger idle event
+                AudioManager.Instance.stopAudio(AudioManager.AudioType.Run);
+                onIdle?.Invoke();
+            }
             // only can jump if havent jumped yet
             if (Input.GetButtonDown("Jump"))
                 onJump?.Invoke(this);
-            // if player is not moving at all & not jumping, trigger idle event
-            if (horizontal==0)
-            {
-                onIdle?.Invoke();
-            }
         }
 
         // in jumping motion
-        else if (jumped)
+        else 
         {
             // as y velocity starts to change to negative -> falling
             if (rb.velocity.y < 0 && rb.velocity.y > -0.25f)
@@ -81,6 +86,7 @@ public class PlayerMovement : MonoBehaviour
             if (rb.velocity.y < 0 && isGrounded())
             {
                 onLand?.Invoke();
+                AudioManager.Instance.playAudio(AudioManager.AudioType.Land);
                 jumped = false;
             }
         }
@@ -100,6 +106,8 @@ public class PlayerMovement : MonoBehaviour
     {
         rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y + jumpVelocity);
         jumped = true;
+        AudioManager.Instance.stopAudio(AudioManager.AudioType.Run);
+        AudioManager.Instance.playAudio(AudioManager.AudioType.Jump);
     }
 
     private void removeMovement()
